@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Hub | Hotel Food Management</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js for Reports -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF for Billing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="logo-container">
+                <div class="logo-icon">🥘</div>
+                <h1>Food<span>Hub</span></h1>
+            </div>
+
+            <nav class="nav-links">
+                <a href="#dashboard" class="nav-item active" onclick="router.navigate('dashboard')">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#food-items" class="nav-item" onclick="router.navigate('food-items')">
+                    <i data-lucide="utensils"></i>
+                    <span>Food Items</span>
+                </a>
+                <a href="#orders" class="nav-item" onclick="router.navigate('orders')">
+                    <i data-lucide="shopping-cart"></i>
+                    <span>New Order</span>
+                </a>
+                <a href="#order-history" class="nav-item" onclick="router.navigate('order-history')">
+                    <i data-lucide="history"></i>
+                    <span>Order History</span>
+                </a>
+                <a href="#reports" class="nav-item" onclick="router.navigate('reports')">
+                    <i data-lucide="bar-chart-3"></i>
+                    <span>Reports</span>
+                </a>
+                <a href="#tracking" class="nav-item" onclick="router.navigate('tracking')">
+                    <i data-lucide="activity"></i>
+                    <span>Trackers</span>
+                </a>
+                <a href="#online-orders" class="nav-item" onclick="router.navigate('online-orders')">
+                    <i data-lucide="globe"></i>
+                    <span>Online Orders</span>
+                </a>
+                <a href="#feedback" class="nav-item" onclick="router.navigate('feedback')">
+                    <i data-lucide="message-square"></i>
+                    <span>Feedback</span>
+                </a>
+                <a href="#about" class="nav-item" onclick="router.navigate('about')">
+                    <i data-lucide="info"></i>
+                    <span>About Us</span>
+                </a>
+                <a href="#contact" class="nav-item" onclick="router.navigate('contact')">
+                    <i data-lucide="phone"></i>
+                    <span>Contact</span>
+                </a>
+                <a href="#admin-panel" class="nav-item" onclick="router.navigate('admin-panel')">
+                    <i data-lucide="settings"></i>
+                    <span>Admin Panel</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="theme-toggle" class="theme-btn">
+                    <i data-lucide="moon" id="moon-icon"></i>
+                    <i data-lucide="sun" id="sun-icon" class="hidden"></i>
+                    <span>Dark Mode</span>
+                </button>
+                <button onclick="resetApp()" class="btn btn-outline btn-full mt-10"
+                    style="border-color: #fee2e2; color: #dc2626;">
+                    <i data-lucide="refresh-ccw"></i> Reset App
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <header class="top-header">
+                <div class="header-left">
+                    <button id="mobile-menu-btn" class="mobile-only">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <h2 id="page-title">Dashboard</h2>
+                </div>
+                <div class="header-right">
+                    <div class="date-display" id="current-date">March 09, 2026</div>
+                    <div class="profile-chip">
+                        <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Manager" alt="User">
+                        <span>Admin</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Sections Wrapper -->
+            <div id="content-sections">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="page-section active">
+                    <div class="stats-grid">
+                        <div class="stat-card red">
+                            <div class="stat-info">
+                                <h3>Total Items</h3>
+                                <p id="stat-total-items">0</p>
+                            </div>
+                            <div class="stat-icon"><i data-lucide="utensils"></i></div>
+                        </div>
+                        <div class="stat-card orange">
+                            <div class="stat-info">
+                                <h3>Total Orders</h3>
+                                <p id="stat-total-orders">0</p>
+                            </div>
+                            <div class="stat-icon"><i data-lucide="shopping-bag"></i></div>
+                        </div>
+                        <div class="stat-card red-light">
+                            <div class="stat-info">
+                                <h3>Most Sold</h3>
+                                <p id="stat-most-sold" style="font-size: 1.2rem; margin-top: 10px; font-weight: 600;">-
+                                </p>
+                            </div>
+                            <div class="stat-icon"><i data-lucide="award"></i></div>
+                        </div>
+                        <div class="stat-card red-light">
+                            <div class="stat-info">
+                                <h3>Weekly Revenue</h3>
+                                <p id="stat-weekly-revenue">₹0</p>
+                            </div>
+                            <div class="stat-icon"><i data-lucide="calendar"></i></div>
+                        </div>
+                        <div class="stat-card orange-light">
+                            <div class="stat-info">
+                                <h3>Today's Revenue</h3>
+                                <p id="stat-today-sales">₹0</p>
+                            </div>
+                            <div class="stat-icon"><i data-lucide="trending-up"></i></div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-charts">
+                        <div class="chart-container glass-card">
+                            <h3>Recent Orders</h3>
+                            <div class="table-responsive">
+                                <table id="recent-orders-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Customer</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-orders-body">
+                                        <!-- Dynamic content -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Food Items Section -->
+                <section id="food-items" class="page-section">
+                    <div class="section-header">
+                        <div class="search-filter">
+                            <div class="input-with-icon">
+                                <i data-lucide="search"></i>
+                                <input type="text" id="food-search" placeholder="Search food items...">
+                            </div>
+                            <select id="category-filter">
+                                <option value="all">All Categories</option>
+                                <option value="Main Food">Main Food</option>
+                                <option value="Fast Food">Fast Food</option>
+                                <option value="Beverages">Beverages</option>
+                                <option value="Juices">Juices</option>
+                                <option value="Desserts">Desserts</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="ui.showModal('food-modal')">
+                            <i data-lucide="plus"></i> Add New Item
+                        </button>
+                    </div>
+
+                    <div id="food-list-grid" class="food-grid mt-20">
+                        <!-- Dynamic content: Cards generated by JS -->
+                    </div>
+                </section>
+
+                <!-- Orders Section -->
+                <section id="orders" class="page-section">
+                    <div class="order-layout">
+                        <div class="food-selection-grid glass-card">
+                            <div class="selection-header">
+                                <h3>Select Items</h3>
+                                <div class="mini-search">
+                                    <input type="text" id="order-food-search" placeholder="Search...">
+                                </div>
+                            </div>
+                            <div class="food-cards-container" id="order-food-list">
+                                <!-- Dynamic content -->
+                            </div>
+                        </div>
+
+                        <div class="cart-summary glass-card">
+                            <h3>Order Summary</h3>
+                            <div class="customer-info">
+                                <input type="text" id="customer-name" placeholder="Customer Name">
+                                <input type="text" id="table-number" placeholder="Table No (e.g. 1)">
+                            </div>
+                            <div class="cart-items" id="cart-list">
+                                <!-- Dynamic content -->
+                            </div>
+                            <div class="cart-total">
+                                <div class="total-row">
+                                    <span>Subtotal</span>
+                                    <span id="subtotal">₹0</span>
+                                </div>
+                                <div class="total-row">
+                                    <span>GST (%)</span>
+                                    <input type="number" id="gst-input" value="5" min="0" style="width: 60px; text-align: right; border: none; background: transparent; color: inherit;">
+                                </div>
+                                <div class="total-row">
+                                    <span>Discount (₹)</span>
+                                    <input type="number" id="discount-input" value="0" min="0" style="width: 60px; text-align: right; border: none; background: transparent; color: inherit;">
+                                </div>
+                                <div class="total-row grand-total">
+                                    <span>Total</span>
+                                    <span id="grand-total">₹0</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary btn-full" id="confirm-order-btn">
+                                <i data-lucide="check-circle-2"></i> Confirm Order & Generate Bill
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Order History Section -->
+                <section id="order-history" class="page-section">
+                    <div class="glass-card">
+                        <div class="section-header">
+                            <h3>Full Order History</h3>
+                            <div class="search-filter">
+                                <input type="text" id="history-search" placeholder="Search orders...">
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table id="history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Order ID</th>
+                                        <th>Customer</th>
+                                        <th>Items</th>
+                                        <th>Total</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="history-body">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Reports Section -->
+                <section id="reports" class="page-section">
+                    <div class="stats-grid mb-20">
+                        <div class="stat-card red">
+                            <div class="stat-info">
+                                <h3>Total Orders</h3>
+                                <p id="report-total-orders">0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card orange">
+                            <div class="stat-info">
+                                <h3>Total Revenue</h3>
+                                <p id="report-total-revenue">₹0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card red-light">
+                            <div class="stat-info">
+                                <h3>Monthly Revenue</h3>
+                                <p id="report-monthly-revenue">₹0</p>
+                            </div>
+                        </div>
+                        <div class="stat-card orange-light">
+                            <div class="stat-info">
+                                <h3>Items Sold</h3>
+                                <p id="report-total-qty">0</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="reports-grid">
+                        <div class="report-card glass-card">
+                            <h3>Daily Report</h3>
+                            <canvas id="revenue-chart"></canvas>
+                        </div>
+                        <div class="report-card glass-card">
+                            <h3>Weekly Report</h3>
+                            <canvas id="top-items-chart"></canvas>
+                        </div>
+                        <div class="report-card glass-card">
+                            <h3>Sales Trend</h3>
+                            <canvas id="sales-trend-chart"></canvas>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Trackers Section -->
+                <section id="tracking" class="page-section">
+                    <div class="stats-grid mb-20">
+                        <div class="stat-card blue">
+                            <div class="stat-info">
+                                <h3>Today's Visitors</h3>
+                                <p id="track-visitors-count">0</p>
+                            </div>
+                            <div class="stat-icon"><i data-lucide="users"></i></div>
+                        </div>
+                        <div class="stat-card orange">
+                            <div class="stat-info">
+                                <h3>Orders Conversion</h3>
+                                <p id="track-conversion-rate">0%</p>
+                            </div>
+                            <div class="stat-icon"><i data-lucide="mouse-pointer-2"></i></div>
+                        </div>
+                    </div>
+                    <div class="glass-card">
+                        <h3>Visitor & Consumption Log</h3>
+                        <form id="visitor-form" class="mt-20 inline-form">
+                            <input type="number" id="visitor-input" placeholder="Add Visitors Count" required min="1">
+                            <button type="submit" class="btn btn-primary">Log Visitors</button>
+                        </form>
+                        <div class="table-responsive mt-20">
+                            <table id="visitor-history-table">
+                                <thead>
+                                    <tr>
+                                        <th>Date</th>
+                                        <th>Visitors</th>
+                                        <th>Orders</th>
+                                        <th>Conversion</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="visitor-history-body"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Online Orders Section -->
+                <section id="online-orders" class="page-section">
+                    <div class="section-header">
+                        <h3>Active Online Orders</h3>
+                        <button class="btn btn-outline" onclick="ui.simulateOnlineOrder()">
+                            <i data-lucide="plus-circle"></i> Simulate New Order
+                        </button>
+                    </div>
+                    <div id="online-orders-list" class="online-orders-grid mt-20">
+                        <!-- Dynamic content -->
+                    </div>
+                </section>
+
+                <!-- Feedback Section -->
+                <section id="feedback" class="page-section">
+                    <div class="order-layout">
+                        <div class="glass-card">
+                            <h3>Customer Feedback Form</h3>
+                            <form id="feedback-form" class="mt-20">
+                                <div class="form-group">
+                                    <label>Customer Name</label>
+                                    <input type="text" id="fb-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>Rating</label>
+                                    <div class="rating-input">
+                                        <input type="radio" name="rating" value="5" id="r5"><label for="r5">⭐5</label>
+                                        <input type="radio" name="rating" value="4" id="r4"><label for="r4">⭐4</label>
+                                        <input type="radio" name="rating" value="3" id="r3" checked><label
+                                            for="r3">⭐3</label>
+                                        <input type="radio" name="rating" value="2" id="r2"><label for="r2">⭐2</label>
+                                        <input type="radio" name="rating" value="1" id="r1"><label for="r1">⭐1</label>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Comments</label>
+                                    <textarea id="fb-comment" rows="4" required
+                                        placeholder="Tell us about your experience..."></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary btn-full">Submit Feedback</button>
+                            </form>
+                        </div>
+                        <div class="glass-card">
+                            <h3>Recent Feedback</h3>
+                            <div id="feedback-list" class="feedback-container">
+                                <!-- Dynamic content -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Admin Panel Section -->
+                <section id="admin-panel" class="page-section">
+                    <div id="admin-login-view" class="glass-card"
+                        style="max-width: 400px; margin: 50px auto; text-align: center;">
+                        <i data-lucide="lock"
+                            style="font-size: 3rem; color: var(--primary-red); margin-bottom: 20px;"></i>
+                        <h2>Admin Login</h2>
+                        <p class="mt-10">Access restricted to authorized personnel only.</p>
+                        <form id="admin-login-form" class="mt-20">
+                            <div class="form-group" style="text-align: left;">
+                                <label>Password</label>
+                                <input type="password" id="admin-password" placeholder="Enter PIN" required>
+                                <p id="login-error" style="color: #ef4444; font-size: 0.8rem; margin-top: 5px;"
+                                    class="hidden">Invalid PIN. Try again.</p>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-full">Login</button>
+                        </form>
+                    </div>
+
+                    <div id="admin-settings-view" class="hidden">
+                        <div class="glass-card mb-20">
+                            <h3>Hotel & Admin Configuration</h3>
+                            <form id="hotel-settings-form" class="mt-20">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Hotel Name</label>
+                                        <input type="text" id="setting-hotel-name" placeholder="E.g. Gourmet Hub">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Admin Name</label>
+                                        <input type="text" id="setting-admin-name" placeholder="E.g. John Doe">
+                                    </div>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Contact Number</label>
+                                        <input type="text" id="setting-hotel-contact" placeholder="E.g. +91 9876543210">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Hotel Address</label>
+                                        <input type="text" id="setting-hotel-address"
+                                            placeholder="E.g. 123 Main St, City">
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Update Details</button>
+                                <button type="button" class="btn btn-outline" id="admin-logout-btn">Logout</button>
+                            </form>
+                        </div>
+
+                        <div class="glass-card">
+                            <h3>Delivery Agent Management</h3>
+                            <form id="agent-form" class="mt-20 inline-form">
+                                <input type="text" id="agent-name" placeholder="Agent Name" required>
+                                <input type="text" id="agent-contact" placeholder="Contact Number" required>
+                                <button type="submit" class="btn btn-primary">Add Agent</button>
+                            </form>
+                            <div class="table-responsive mt-20">
+                                <table id="agent-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Name</th>
+                                            <th>Contact</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="agent-body"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="food-modal" class="modal">
+        <div class="modal-content glass-card slide-up">
+            <div class="modal-header">
+                <h2 id="modal-title">Add Food Item</h2>
+                <button class="close-btn" onclick="ui.hideModal('food-modal')">&times;</button>
+            </div>
+            <form id="food-form">
+                <input type="hidden" id="food-id">
+                <div class="form-group">
+                    <label for="food-name">Food Name</label>
+                    <input type="text" id="food-name" required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="food-category">Category</label>
+                        <select id="food-category" required>
+                            <option value="Main Food">Main Food</option>
+                            <option value="Fast Food">Fast Food</option>
+                            <option value="Beverages">Beverages</option>
+                            <option value="Juices">Juices</option>
+                            <option value="Desserts">Desserts</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="food-price">Price (₹)</label>
+                        <input type="number" id="food-price" required min="0">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="food-desc">Description</label>
+                    <textarea id="food-desc" rows="3"></textarea>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="food-stock">Availability</label>
+                        <select id="food-stock" required>
+                            <option value="In Stock">In Stock</option>
+                            <option value="Out of Stock">Out of Stock</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="food-image">Upload Image (Optional)</label>
+                        <input type="file" id="food-image" accept="image/*">
+                    </div>
+                </div>
+                <div id="image-preview" class="image-preview hidden"></div>
+                <button type="submit" class="btn btn-primary btn-full mt-20">Save Item</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Bill Modal -->
+    <div id="bill-modal" class="modal">
+        <div class="modal-content glass-card bill-view bounce-in">
+            <div id="bill-content">
+                <!-- Dynamic content -->
+            </div>
+            <div class="bill-actions">
+                <button class="btn btn-outline" onclick="ui.hideModal('bill-modal')">Close</button>
+                <button class="btn btn-primary" id="download-bill-btn">
+                    <i data-lucide="download"></i> Download PDF
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
